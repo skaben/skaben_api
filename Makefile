@@ -7,7 +7,7 @@ build:	## Build project with compose
 	docker-compose build
 
 .PHONY: up
-up:	## Run project with compose
+start:  ## Run project with compose
 	docker-compose up --remove-orphans
 
 .PHONY: clean
@@ -20,26 +20,26 @@ requirements:	## Refresh requirements.txt from pipfile.lock
 
 .PHONY: test
 test:	## Run project tests
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml  run --rm app pytest
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml  run --rm skaben pytest
 
 .PHONY: safety
 safety:	## Check project and dependencies with safety https://github.com/pyupio/safety
-	docker-compose run --rm app safety check
+	docker-compose run --rm skaben safety check
 
 .PHONY: py-upgrade
 py-upgrade:	## Upgrade project py files with pyupgrade library for python version 3.10
-	pyupgrade --py310-plus `find the_app -name "*.py"`
+	pyupgrade --py310-plus `find skaben -name "*.py"`
 
 .PHONY: lint
 lint:  ## Lint project code.
-	isort the_app tests --check
-	flake8 --config .flake8 the_app tests
-	mypy the_app tests
-	black the_app tests --line-length=120 --check --diff
+	isort skaben tests --check
+	flake8 --config .flake8 skaben tests
+	mypy skaben tests
+	black skaben tests --line-length=120 --check --diff
 
 
 .PHONY: format
 format:  ## Format project code.
-	isort the_app tests
-	autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place the_app tests --exclude=__init__.py
-	black the_app tests --line-length=120
+	isort skaben tests
+	autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place skaben tests --exclude=__init__.py
+	black skaben tests --line-length=120

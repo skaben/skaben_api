@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from pydantic import BaseSettings
 
-from the_app.utils import get_logger
+from skaben.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -27,10 +27,10 @@ class Settings(BaseSettings):
 
     """
 
-    pg_user: str = os.getenv("SQL_USER", "")
-    pg_pass: str = os.getenv("POSTGRES_PASSWORD", "")
-    pg_host: str = os.getenv("SQL_HOST", "")
-    pg_database: str = os.getenv("SQL_DB", "")
+    pg_user: str = os.getenv("DB_USER", "")
+    pg_pass: str = os.getenv("DB_PASSWORD", "")
+    pg_host: str = os.getenv("DB_HOST", "")
+    pg_database: str = os.getenv("DB_NAME", "")
     asyncpg_url: str = f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:5432/{pg_database}"
 
     jwt_secret_key: str = os.getenv("SECRET_KEY", "")

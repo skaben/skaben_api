@@ -1,20 +1,21 @@
-# Pull base image
 FROM python:3.10-slim-buster as builder
 
-# Set environment variables
-COPY requirements.txt requirements.txt
+ENV PYTHONUBUFFERED=1 \
+    VIRTUAL_ENV=/venv \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Install pipenv
-RUN set -ex && pip install --upgrade pip
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install dependencies
-RUN set -ex && pip install -r requirements.txt
+RUN pip install --upgrade pip
 
 FROM builder as final
-WORKDIR /code
-COPY ./the_app/ /code/
-COPY ./tests/ /code/
-COPY .env /code/
 
-RUN set -ex && bash -c "eval $(grep 'PYTHONDONTWRITEBYTECODE' .env)"
-RUN set -ex && bash -c "eval $(grep 'PYTHONUNBUFFERED' .env)"
+ENV PYTHONPATH="/opt/app/skaben"
+WORKDIR /opt/app
+COPY . .
+RUN pip install -r requirements.txt
+
+EXPOSE 80 443
+
+CMD ["sh", "-c", "/opt/app/entrypoint.sh"]
