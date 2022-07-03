@@ -11,7 +11,7 @@ RUN pip install --upgrade pip
 
 FROM builder as final
 
-ENV PYTHONPATH="/opt/app/skaben"
+ENV PYTHONPATH="${PYTHONPATH}:/opt/app/skaben"
 WORKDIR /opt/app
 COPY requirements.txt .
 RUN pip install -r requirements.txt

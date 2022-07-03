@@ -1,7 +1,8 @@
 import kombu
 import logging
-from kombu import Connection, Exchange, Queue
 
+from functools import lru_cache
+from kombu import Connection, Exchange, Queue
 from skaben.config import get_settings
 
 settings = get_settings()
@@ -34,14 +35,19 @@ class MQConfig:
     exchanges: dict
     queues: dict
 
-    def __init__(self, amqp_url: str):
-        self.conn = Connection(amqp_url)
+    def __init__(self):
+        self.exchanges = {}
+        self.queues = {}
+        if not settings.amqp_uri:
+            logging.error('AMQP settings is missing, exchanges will not be initialized')
+            return
+        self.conn = Connection(settings.amqp_uri)
         self.pool = self.conn.ChannelPool()
 
     def init_mqtt_exchange(self) -> dict:
         """Initialize MQTT exchange infrastructure"""
         logging.info('initializing mqtt exchange')
-        with self.pool.acquire(timeout=settings.amqp_timeout) as channel:
+        with self.pool.acquire(timeout=settings.amqp.timeout) as channel:
             # main mqtt exchange, used for messaging out.
             # note that all replies from clients starts with 'ask.' routing key goes to ask exchange
             self.exchanges.update(mqtt=MQFactory.create_exchange(channel, 'mqtt'))
@@ -52,7 +58,7 @@ class MQConfig:
         if not self.exchanges.get('mqtt'):
             self.init_mqtt_exchange()
 
-        with self.pool.acquire(timeout=settings.amqp_timeout) as channel:
+        with self.pool.acquire(timeout=settings.amqp.timeout) as channel:
             ask_exchange = MQFactory.create_exchange(channel, 'ask')
             ask_exchange.bind_to(exchange=self.exchanges['mqtt'],
                                  routing_key='ask.#',
@@ -63,7 +69,7 @@ class MQConfig:
     def init_internal_exchange(self):
         """Initializing internal direct exchange"""
         logging.info('initializing internal exchange')
-        with self.pool.acquire(timeout=settings.amqp_timeout) as channel:
+        with self.pool.acquire(timeout=settings.amqp.timeout) as channel:
             exchange = MQFactory.create_exchange(channel, 'internal', 'direct')
             self.exchanges.update(internal=exchange)
         return self.exchanges
@@ -99,9 +105,10 @@ class MQConfig:
         self.queues.update(**queues)
         return self.queues
 
+    def __str__(self):
+        return f"<MQConfig connected to {settings.amqp_uri}>"
 
-if not settings.amqp.url:
-    logging.error('AMQP settings is missing, exchanges will not be initialized')
-    mq_config = None
-else:
-    mq_config = MQConfig(settings.amqp.url)
+
+@lru_cache()
+def get_mq_config():
+    return MQConfig()

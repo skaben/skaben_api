@@ -2,15 +2,18 @@ import time
 import traceback
 from typing import Union
 
-from skaben.modules.mq.config import MQConfig
+from skaben.config import get_settings
+from skaben.modules.mq.config import get_mq_config
+
+settings = get_settings()
 
 
 class MQInterface:
 
-    def __init__(self, config: MQConfig, limited: bool):
-        self.config = config
+    def __init__(self):
+        self.config = get_mq_config()
         self.config.init_mqtt_exchange()
-        if not limited:
+        if not settings.amqp.limited:
             self.config.init_transport_queues()
             self.config.init_internal_queues()
 
@@ -42,3 +45,6 @@ class MQInterface:
                 routing_key=routing_key,
                 retry=True
             )
+
+    def __str__(self):
+        return f'<MQInterface ["config": {self.config}]>'

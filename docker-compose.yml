@@ -9,6 +9,8 @@ services:
     volumes:
       - .:/opt/app
       - package_data:/venv
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - 8080:8080
     depends_on:

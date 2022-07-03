@@ -11,7 +11,10 @@ logger = get_logger(__name__)
 class AMQPSettings(BaseSettings):
     """AMQP settings"""
 
-    url: str = os.getenv('URL')
+    user: str
+    password: str
+    host: str
+    port: int = os.getenv('PORT', 5672)
     timeout: int = os.getenv('TIMEOUT', 10)
     limited: bool = os.getenv('LIMITED', False)
 
@@ -42,13 +45,15 @@ class Settings(BaseSettings):
     pg_user: str = os.getenv("POSTGRES_USER")
     pg_pass: str = os.getenv("POSTGRES_PASSWORD")
     pg_database: str = os.getenv("POSTGRES_DB")
-    asyncpg_url: str = f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:5432/{pg_database}"
 
     jwt_secret_key: str = os.getenv("SECRET_KEY", "")
     jwt_algorithm: str = os.getenv("ALGORITHM", "")
     jwt_access_toke_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1)
 
-    amqp: AMQPSettings()
+    amqp: AMQPSettings = AMQPSettings()
+
+    amqp_uri: str = f'pyamqp://{amqp.user}:{amqp.password}@{amqp.host}:{amqp.port}'
+    asyncpg_url: str = f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:5432/{pg_database}"
 
 
 @lru_cache()
