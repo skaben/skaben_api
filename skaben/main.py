@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from skaben.database import engine
 from skaben.models.base import Base
 from skaben.utils import get_logger
+from skaben.config import get_settings
+from skaben.modules.mq.config import exchanges
 
 logger = get_logger(__name__)
 
@@ -20,6 +22,7 @@ app = FastAPI(title="SKABEN API", version="0.1")
 
 @app.on_event("startup")
 async def startup_event():
+    settings = get_settings()
     logger.info("Starting up...")
     # await start_db()
 

@@ -8,6 +8,17 @@ from skaben.utils import get_logger
 logger = get_logger(__name__)
 
 
+class AMQPSettings(BaseSettings):
+    """AMQP settings"""
+
+    url: str = os.getenv('URL')
+    timeout: int = os.getenv('TIMEOUT', 10)
+    limited: bool = os.getenv('LIMITED', False)
+
+    class Config:
+        env_prefix = "AMQP_"
+
+
 class Settings(BaseSettings):
     """
 
@@ -37,10 +48,11 @@ class Settings(BaseSettings):
     jwt_algorithm: str = os.getenv("ALGORITHM", "")
     jwt_access_toke_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1)
 
+    amqp: AMQPSettings()
+
 
 @lru_cache()
 def get_settings():
     logger.info("Loading config settings from the environment...")
     settings = Settings()
-    logger.info(settings.__dict__)
     return settings

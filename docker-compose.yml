@@ -20,6 +20,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/dumps:/home/root/dumps
     env_file:
       - .env
       - .secrets
