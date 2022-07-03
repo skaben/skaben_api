@@ -13,9 +13,10 @@ FROM builder as final
 
 ENV PYTHONPATH="/opt/app/skaben"
 WORKDIR /opt/app
-COPY . .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
+COPY . .
 
-EXPOSE 80 443
+EXPOSE 80 443 8080
 
 CMD ["sh", "-c", "/opt/app/entrypoint.sh"]

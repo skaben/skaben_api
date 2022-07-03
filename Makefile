@@ -6,9 +6,13 @@ help: ## Show this help
 build:	## Build project with compose
 	docker-compose build
 
-.PHONY: up
+.PHONY: start
 start:  ## Run project with compose
-	docker-compose up --remove-orphans
+	docker-compose up --remove-orphans --force-recreate
+
+.PHONY: stop
+stop:  	## Run project with compose
+	docker-compose down --remove-orphans
 
 .PHONY: clean
 clean: ## Clean Reset project containers with compose
