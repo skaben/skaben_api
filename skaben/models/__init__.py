@@ -1,0 +1,1 @@
+from skaben.models.base import Base  # noqa
