@@ -5,29 +5,21 @@ import sys
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
-
 parent_dir = os.path.abspath(os.path.join(os.getcwd()))
 sys.path.append(parent_dir)
 
 from skaben.models.base import Base as app_base
+from skaben.config import get_settings
+from skaben.models import (
+    device,
+)
 
 target_metadata = app_base.metadata
+settings = get_settings()
 
 
 def run_migrations_offline():
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
-    url = f"postgresql+asyncpg://user:secret@db:5432/devdb"
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(url=settings.asyncpg_url, target_metadata=target_metadata, literal_binds=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -47,8 +39,7 @@ async def run_migrations_online():
     and associate a connection with the context.
 
     """
-    url = f"postgresql+asyncpg://user:secret@db:5432/devdb"
-    connectable = create_async_engine(url)
+    connectable = create_async_engine(settings.asyncpg_url)
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
