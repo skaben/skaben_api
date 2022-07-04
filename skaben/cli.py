@@ -1,20 +1,11 @@
-import os
-import sys
 import typer
-import logging
-
+from skaben.modules.mq.recurrent import mq_app
 from skaben.config import get_settings
-from skaben.modules.mq.interface import MQInterface
 
-app = typer.Typer()
 settings = get_settings()
 
-
-@app.command()
-def test():
-    """test command"""
-    handler = MQInterface()
-    typer.echo(f'Get handler {handler}')
+app = typer.Typer()
+app.add_typer(mq_app, name="mq")
 
 
 @app.command()

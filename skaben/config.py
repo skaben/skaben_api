@@ -8,6 +8,15 @@ from skaben.utils import get_logger
 logger = get_logger(__name__)
 
 
+class AppSettings(BaseSettings):
+    """SKABEN app settings"""
+
+    timeout: int = os.getenv('TIMEOUT', 5)
+
+    class Config:
+        env_prefix = "APP_"
+
+
 class AMQPSettings(BaseSettings):
     """AMQP settings"""
 
@@ -51,6 +60,7 @@ class Settings(BaseSettings):
     jwt_access_toke_expire_minutes: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1)
 
     amqp: AMQPSettings = AMQPSettings()
+    app: AppSettings = AppSettings()
 
     amqp_uri: str = f'pyamqp://{amqp.user}:{amqp.password}@{amqp.host}:{amqp.port}'
     asyncpg_url: str = f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:5432/{pg_database}"

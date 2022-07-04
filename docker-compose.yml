@@ -16,6 +16,18 @@ services:
     depends_on:
       - db
 
+  app-pinger:
+    build: .
+    command: "python skaben/cli.py mq ping"
+    env_file:
+      - .env
+      - .secrets
+    volumes:
+      - .:/opt/app
+      - package_data:/venv
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   db:
     build:
       context: ./db

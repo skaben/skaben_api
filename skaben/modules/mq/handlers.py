@@ -6,12 +6,11 @@ from typing import Union, Optional
 from kombu.mixins import ConsumerProducerMixin
 from kombu.message import Message
 
-from skaben.helpers import new_task_id
 from skaben.config import get_settings
 from skaben.modules.mq.config import MQConfig
 from skaben.modules.mq.interface import MQInterface
 
-from skaben.modules.devices import SmartDeviceEnum, DeviceEnum
+from skaben.modules.core.devices import SmartDeviceEnum, DeviceEnum
 
 settings = get_settings()
 
@@ -19,8 +18,8 @@ settings = get_settings()
 class MessageHandler(ConsumerProducerMixin, MQInterface):
     """MQ Message handler class"""
 
-    def __init__(self):
-        super(MQInterface).__init__()
+    def __init__(self, config: MQConfig):
+        super(MQInterface).__init__(config)
 
     def handle_message(self, body: Union[str, dict], message: Message) -> dict:
         """parse MQTT message to dict or return untouched if it's already dict
@@ -63,7 +62,7 @@ class MessageHandler(ConsumerProducerMixin, MQInterface):
             return {}
 
     @staticmethod
-    def parse_basic(routing_key: str) -> dict:
+    def parse_basic(routing_key: list) -> dict:
         """get device parameters from topic name (routing key)"""
         device_type, device_uid, command = routing_key
         data = dict(device_type=device_type,

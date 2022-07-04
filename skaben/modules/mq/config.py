@@ -111,4 +111,9 @@ class MQConfig:
 
 @lru_cache()
 def get_mq_config():
-    return MQConfig()
+    config = MQConfig()
+    config.init_mqtt_exchange()
+    if not settings.amqp.limited:
+        config.init_transport_queues()
+        config.init_internal_queues()
+    return config
